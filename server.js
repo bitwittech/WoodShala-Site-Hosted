@@ -29,11 +29,11 @@ app.use('/upload',express.static(path.join(__dirname, 'upload')));
 // requiring the routes
 app.use('/api/',require('./server/routes'))
 
-app.use(express.static("frontend/build"));
+  app.use(express.static("frontEnd/build"));
   
-app.get("*",(req,res)=>{
-  res.sendFile(path.resolve(__dirname,'frontend','build','index.html'))
-})
+  app.get("*",(req,res)=>{
+    res.sendFile(path.resolve(__dirname,'frontEnd','build','index.html'))
+  })
 
 app.listen(port,()=>{
         console.log('Server is running at port',port);

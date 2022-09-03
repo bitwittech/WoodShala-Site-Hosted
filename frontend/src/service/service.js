@@ -9,17 +9,17 @@ let official = 'http://134.209.150.190'
 
 // for register
 export const register = async(data)=>{
-    return await axios.post(`${localApi}/api/register`,data);
+    return await axios.post(`${official}/api/register`,data);
 }
 
 // for login 
 export const login = async(data)=>{
-    return await axios.post(`${localApi}/api/login`,data);
+    return await axios.post(`${official}/api/login`,data);
 }
 
 // for getting user details  
 export const getCustomer = async(CID)=>{
-    return await axios.get(`${localApi}/api/getCustomer?CID=${CID}`,
+    return await axios.get(`${official}/api/getCustomer?CID=${CID}`,
     {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
