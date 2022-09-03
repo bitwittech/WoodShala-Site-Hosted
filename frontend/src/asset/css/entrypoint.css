@@ -1,0 +1,41 @@
+hr {
+    margin-top: 10px;
+    border-color: rgba(226, 226, 226, 0.356);
+}
+
+.formBox {
+    padding: 5%;
+}
+
+.posterImage {
+    height: 100%;
+    width: 100%;
+}
+
+.box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+}
+
+@media screen and (max-width: 800px) {
+    .sidePic {
+        display: none;
+    }
+    .modelContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .form {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+    .box {
+        padding: 1%;
+    }
+}

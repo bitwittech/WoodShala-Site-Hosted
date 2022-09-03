@@ -1,6 +1,7 @@
 // packages 
 const bcrypt = require("bcrypt");
 const JWT = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
 
 // DB modules 
 const userDB = require("../../database/models/user");
@@ -10,41 +11,36 @@ const userDB = require("../../database/models/user");
 
 
 
-// for deafulting paging
+// for defaulting paging
 exports.home = (req, res) => {
     res.send("This Apis is written for the WoodSala!!!");
 };
 
 
-// for registration API
+// place an customer 
 
-exports.register = async(req, res) => {
+exports.register = async(req,res) => {   
+    req.body.CID = `CID-${uuidv4()}`
+    console.log(req.body);
+   const data = userDB(req.body);
+    await data.save(req.body)
+    .then((response)=>{
+       return res.status(200).send({message : 'Customer added successfully !!!'});
+    })
+    .catch((err)=>{
+       return res.status(406).send({message : 'Duplicate entries are not allowed !!!'})
+    })
+}
 
+// function for generate JWT
 
-    const data = userDB(req.body);
-
-    data
-        .save()
-        .then((response) => {
-            return res.status(200).send(req.body);
-        })
-        .catch((err) => {
-            console.log({ err });
-            return res.status(203).send({ massage: "User Not Added !!!" });
-        });
-};
-
-// for login Api
-
-// function for genrate JWT
-
-function genrateJWT(data) {
-    // console.log(process.env.JWT_Secreet)
-    const token = JWT.sign(data,"asdfijeh9oina3i432i4988*&*&(*&*()()ok5n3la^&*%*&T(bkjh9s8ew9(*H(OH**(H)OM)_(U)N)(Yn39873389(*u4054m5k4n5");
+function generateJWT(data) {
+    
+    const token = JWT.sign(data,process.env.JWT_Secrete);
     return token;
 }
 
-
+// login
 exports.login = (req, res) => {
 
     console.log(req.body)
@@ -56,17 +52,12 @@ exports.login = (req, res) => {
             console.log(data)
             if (data != null) {
                 bcrypt.compare(req.body.password, data.password, function(err, result) {
-                    console.log(req.body.role,data.role)
-
+                    console.log(err,result)
                     if (result === true) {
-                        
-                        if(req.body.role !== data.role)
-                            return res.status(203).send({ message: "Incorrect Role !!!" })
-                        
-                        let token = genrateJWT(req.body);
+                        let token = generateJWT(req.body);
                         console.log(data)
                         console.log("User Found !!!", data);
-                        return res.send({ message: "Log In Successfully !!!", token, name: data.user_Name, email: data.email, role : data.role })
+                        return res.send({ message: "Log In Successfully !!!", token, name: data.username, email: data.email, CID : data.CID })
 
                     } else
                         return res.status(203).send({ message: "User Not Found !!!" })
@@ -79,6 +70,35 @@ exports.login = (req, res) => {
             console.log({ message: "User Not Found !!!", err });
             return res.status(203).send({ message: "User Not Found !!!", err })
         })
+
+}
+
+// get customer
+exports.getCustomer = (req,res) =>{
+    userDB.findOne({CID : req.query.CID})
+    .then((data)=>{
+        // console.log(data)
+        return res.status(200).send(data)
+    })
+    .catch((err)=>{
+        console.log(err)
+        return res.status(404).send(err)
+    })
+
+}
+
+// update Customer
+exports.updateCustomer = (req,res) =>{
+    console.log('FILES >>> ',req.files)
+    console.log('Body >>> ',req.body)
+    userDB.updateOne({CID : req.body.CID},req.body)
+    .then((response)=>{
+        res.send('Changes Saved !!!')
+    })
+    .catch((err)=>{
+        console.log(err)
+        res.send(422).send({message : 'Something went wrong !!!'})
+    })
 
 }
 
