@@ -6,6 +6,8 @@ const multer = require('multer')
 
 // CONTROLLER
 const user = require("./controller/user");
+const product = require("./controller/product");
+const cart = require("./controller/cart");
 
 
 // middleware for the multer setup
@@ -55,10 +57,9 @@ function encode(req, res, next) {
 
     bcrypt.genSalt(saltRounds, (err, salt) => {
         bcrypt.hash(req.body.password, salt, function(err, hash) {
-            // console.log(">>>>>", hash);
+            // async (req,res)(">>>>>", hash);
             if (hash !== null) {
                 req.body.password = hash;
-                console.log(req.body.password);
                 next();
             }
         });
@@ -73,7 +74,7 @@ route.use(bodyParser.json());
 // middleware For Authentication
 
 function AuthJwt(req, res, next) {
-    // console.log(req.headers)
+    // //async (req,res)(req.headers)
 
     if (req.headers.authorization === undefined) return res.sendStatus(401);
 
@@ -98,9 +99,34 @@ route.post("/register", encode, user.register);
 route.post("/login", upload, user.login);
 
 // get user
-route.get("/getCustomer", AuthJwt, upload, user.getCustomer);
+route.get("/getCustomer", user.getCustomer);
 
 // update user
 route.patch("/updateCustomer", AuthJwt, upload, user.updateCustomer);
+
+// =================== Product routes =======================
+
+// listing product 
+route.get("/getProducts",product.getProducts)
+
+// get details product 
+route.get("/getProductDetails",product.getProductDetails)
+
+// ==================== Cart routes ==========================
+
+// add item in cart 
+route.post("/addCartItem",AuthJwt, cart.addCartItem)
+
+// remove item from cart 
+route.get("/removeCartItem", cart.removeCartItem)
+
+// get item in cart 
+route.get("/getCartItem", cart.getCartItem)
+
+// get item details in cart 
+route.get("/getDetails", cart.getDetails)
+
+// update item details in cart 
+route.patch("/updateQuantity",AuthJwt, cart.updateQuantity)
 
 module.exports = route;

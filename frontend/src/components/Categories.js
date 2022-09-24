@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Carousel from "react-multi-carousel";
 
 //mui
@@ -18,21 +18,81 @@ import {
 import "../asset/css/categories.css";
 import "react-multi-carousel/lib/styles.css";
 
-//image
-import living from ".././asset/images/home/sofa_SBR.png";
-import wfh from ".././asset/images/home/table_SBR.png";
-import bedroom from ".././asset/images/home/bedroom_SBR.png";
-import dining from ".././asset/images/home/dining_SBR.png";
-
 // icon
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import AddShoppingCartOutlinedIcon from "@mui/icons-material/AddShoppingCartOutlined";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessOutlinedIcon from '@mui/icons-material/ExpandLessOutlined';
 import FilterListOutlinedIcon from "@mui/icons-material/FilterListOutlined";
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+//image
+import living from ".././asset/images/home/sofa_SBR.png";
+import wfh from ".././asset/images/home/table_SBR.png";
+import bedroom from ".././asset/images/home/bedroom_SBR.png";
+import dining from ".././asset/images/home/dining_SBR.png";
 
-export default function Categories() {
-  const items = [
+// store 
+import { Store } from '../store/Context'
+// types 
+import { AddCartItem, Notify } from "../store/Types";
+
+
+// services 
+import { getProducts, addCartItem, removeCartItem, getCartItem } from '../service/service'
+
+export default function Categories(props) {
+
+  // history
+  const history = props.history;
+  // responsive oject for Slider
+  const responsive = {
+    desktop: {
+      breakpoint: { max: 3000, min: 1024 },
+      items: 3,
+    },
+    tablet: {
+      breakpoint: { max: 800, min: 600 },
+      items: 2,
+    },
+    mobile: {
+      breakpoint: { max: 600, min: 0 },
+      items: 1,
+    },
+  };
+
+  // store
+  const { state, dispatch } = Store();
+
+
+  // use Effect
+  useEffect(() => {
+
+    getProducts()
+      .then((data) => {
+        //console.log(data)
+        return setItems(data.data)
+      })
+      .catch((err) => {
+        //console.log(err)
+      })
+
+    if (state.Auth.isAuth) {
+      getCartItem(state.Auth.CID)
+        .then((response) => {
+          if (localStorage.getItem('cart') !== null)
+            response.data.concat(JSON.parse(localStorage.getItem('cart')).items)
+
+          // console.log(response.data)
+          dispatch({
+            type: AddCartItem,
+            payload: { items: response.data }
+          })
+        })
+    }
+
+  }, [state.Auth.isAuth])
+
+  const categories = [
     {
       image: living,
       name: "Living",
@@ -95,30 +155,154 @@ export default function Categories() {
     },
   ];
 
-  const responsive = {
-    desktop: {
-      breakpoint: { max: 3000, min: 1024 },
-      items: 3,
-    },
-    tablet: {
-      breakpoint: { max: 800, min: 600 },
-      items: 2,
-    },
-    mobile: {
-      breakpoint: { max: 600, min: 0 },
-      items: 1,
-    },
-  };
+  const [items, setItems] = useState([])
 
   const [expanded, setExpanded] = useState("");
 
   // State
   const [filterShow, setFilter] = useState(false);
 
-  // handle accordians
+  // handle accordions
   const handleChange = (panel) => (event, newExpanded) => {
     setExpanded(newExpanded ? panel : false);
   };
+
+  // addItemToCart 
+  const addToCart = async (item) => {
+
+
+    // server side 
+    if (state.Auth.isAuth) {
+      await addCartItem({
+        CID: state.Auth.CID,
+        product_id: item.SKU,
+        quantity: 1,
+      })
+        .then((response) => {
+          // for client side 
+          dispatch(
+            {
+              type: AddCartItem,
+              payload: {
+                items: [...state.AddCartItem.items,
+                {
+                  CID: state.Auth.CID || 'Not Logged In',
+                  product_id: item.SKU,
+                  quantity: 1,
+                }]
+              }
+            }
+          )
+          return dispatch({
+            type: Notify,
+            payload: {
+              variant: 'success',
+              message: response.data.message,
+              open: true
+            }
+          })
+        })
+        .catch((err) => {
+          return dispatch({
+            type: Notify,
+            payload: {
+              variant: 'error',
+              message: 'Something Went Wrong !!!',
+              open: true
+            }
+          })
+        })
+    }
+    else {
+
+      // for client side 
+      dispatch(
+        {
+          type: AddCartItem,
+          payload: {
+            items: [...state.AddCartItem.items,
+            {
+              CID: state.Auth.CID || 'Not Logged In',
+              product_id: item.SKU,
+              quantity: 1,
+            }]
+          }
+        }
+      )
+      return dispatch({
+        type: Notify,
+        payload: {
+          variant: 'success',
+          message: 'Item added to the cart !!!',
+          open: true
+        }
+      })
+
+    }
+  }
+
+  // removeItemFromCart 
+  const removeItemFromCart = async (item) => {
+
+    // server side 
+    if (state.Auth.isAuth) {
+      await removeCartItem({
+        CID: state.Auth.CID,
+        product_id: item.SKU
+      })
+        .then((response) => {
+          // for client side
+          dispatch(
+            {
+              type: AddCartItem,
+              payload: {
+                items: state.AddCartItem.items.filter((row) => { return row.product_id !== item.SKU })
+              }
+            }
+          )
+          return dispatch({
+            type: Notify,
+            payload: {
+              variant: 'warning',
+              message: response.data.message,
+              open: true
+            }
+          })
+        })
+        .catch((err) => {
+          return dispatch({
+            type: Notify,
+            payload: {
+              variant: 'error',
+              message: 'Something Went Wrong !!!',
+              open: true
+            }
+          })
+        })
+    }
+    else {
+      // for client side
+      dispatch(
+        {
+          type: AddCartItem,
+          payload: {
+            items: state.AddCartItem.items.filter((row) => { return row.product_id !== item.SKU })
+          }
+        }
+      )
+      return dispatch({
+        type: Notify,
+        payload: {
+          variant: 'warning',
+          message: 'Item removed added to the cart !!!',
+          open: true
+        }
+      })
+
+    }
+
+
+  }
 
   return (
     <>
@@ -143,12 +327,12 @@ export default function Categories() {
         {/* carousal for sub cat */}
         <Grid item xs={12} className="subCatContainer">
           <Carousel keyBoardControl={true} ssr={true} responsive={responsive}>
-            {items.map((item, index) => {
+            {categories.map((item, index) => {
               return (
                 <Box key={index} sx={{
                   padding: "10%",
                 }} className="card ">
-                  <img src={item.image} alt={index}  />
+                  <img src={item.image} alt={index} />
                   <Typography
                     sx={{
                       fontSize: "1.2rem",
@@ -158,7 +342,7 @@ export default function Categories() {
                     align="center"
                     variant="button"
                   >
-                    {item.name}
+                    {item.product_title}
                   </Typography>
                 </Box>
               );
@@ -433,41 +617,52 @@ export default function Categories() {
 
         {/* product container */}
         <Grid className="productContainer" item xs={12} md={10}>
-          <Grid container className = 'innerProductWrap' sx={{ gap: "15px" }}>
+          {/* {console.log(state.AddCartItem)} */}
+          <Grid container className='innerProductWrap' >
             {items.map((item, index) => {
               return (
                 <Grid
                   item
-                  key = {index}
+                  key={index}
                   className="productCard"
                   xs={window.innerWidth <= '600' ? 10 : 5.8}
-                  sx={{ boxShadow: 2 }}
+                  sx={{ boxShadow: 2, maxHeight: '100%' }}
                   md={3.87}
                 >
-                  <Box>
-                    <img src={item.image} alt="product_Images" />
-                    <Grid container>
-                      <Grid item xs={9}>
-                        <Box className="productInfo">
-                          <Typography variant="h5">{item.name}</Typography>
-                          <Typography variant="body2">
-                            Lorem ipsum dolor sit amet.
-                          </Typography>
-                          <Typography variant="h6">Rs.{item.price}</Typography>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={3}>
-                        <Box className="buttonAction">
-                          <IconButton>
-                            <AddShoppingCartOutlinedIcon></AddShoppingCartOutlinedIcon>
-                          </IconButton>
-                          <IconButton>
-                            <FavoriteBorderOutlinedIcon></FavoriteBorderOutlinedIcon>
-                          </IconButton>
-                        </Box>
-                      </Grid>
+                  <Grid container>
+                    <Grid item xs={12} 
+                  onClick = {() => history(`/details?SKU=${item.SKU}`)}
+                    
+                    >
+                      <img src={item.featured_image} alt="product_Images" />
                     </Grid>
-                  </Box>
+                    <Grid item xs={9}>
+                      <Box className="productInfo">
+                        <Typography  variant="h5" >{item.product_title}</Typography>
+                        <Typography variant="body2">
+                          Lorem ipsum dolor sit amet consectetur adipisicing elit. Est harum natus error facilis similique officiis ea nisi architecto explicabo tenetur Aspernatur?
+                        </Typography>
+                        <Typography variant="h5">{item.discount_limit}% Off</Typography>
+                        <Typography variant="h6"><s>Rs.{item.MRP}</s></Typography>
+                        <Typography variant="h5">Rs.{item.selling_price}</Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={3}>
+                      <Box className="buttonAction">
+                        {
+                          state.AddCartItem.items.filter((row) => { return row.product_id === item.SKU }).length > 0 ?
+                            <IconButton onClick={() => removeItemFromCart(item)}><ShoppingCartIcon  /></IconButton> :
+                            <IconButton onClick={() => addToCart(item)}>
+                              <AddShoppingCartOutlinedIcon ></AddShoppingCartOutlinedIcon>
+                            </IconButton>
+                        }
+
+                        <IconButton>
+                          <FavoriteBorderOutlinedIcon></FavoriteBorderOutlinedIcon>
+                        </IconButton>
+                      </Box>
+                    </Grid>
+                  </Grid>
                 </Grid>
               );
             })}

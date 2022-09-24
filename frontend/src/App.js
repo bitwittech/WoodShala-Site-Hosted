@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import "./App.css";
 
@@ -12,8 +12,8 @@ import Footer from "./components/utility/Footer"
 import SnakBar from "./components/utility/SnakBar"
 
 // context
-import {Store} from './store/Context'
-import {Auth} from './store/Types'
+// import {Store} from './store/Context'
+// import {Auth} from './store/Types'
 
 // components
 import Home from "./components/Home";
@@ -22,8 +22,9 @@ import Checkout from "./components/Checkout";
 import ProductDetails from "./components/ProductDetails";
 import ContactUs from "./components/ContactUs";
 import Categories from "./components/Categories";
-import EntryPoint from "./components/EntryPoint"
-import Profile from "./components/Profile"
+import EntryPoint from "./components/EntryPoint";
+import Profile from "./components/Profile";
+
 
 // global theme
 const light = createTheme({
@@ -47,18 +48,6 @@ const light = createTheme({
 
 function App() {
 
-  const {dispatch} = Store(); 
-
-  // for data persistance
-  useEffect(()=>{
-   if (localStorage.getItem('payload') !== null)
-   {
-      dispatch({
-        type : Auth,
-        payload : JSON.parse(localStorage.getItem('payload'))
-      })
-   }
-  },[])
 
 
   function Path() {
@@ -68,13 +57,13 @@ function App() {
       <>
         <Navbar history={history} />
         <Routes>
-          <Route path="/" element={<Home />}></Route>
-          <Route path="/home" element={<Home />}></Route>
+          <Route path="/" element={<Home history={history}/>}></Route>
+          <Route path="/home" element={<Home history={history} />}></Route>
           <Route path="/cart" element={<Cart history={history} />}></Route>
           <Route path="/checkout" element={<Checkout />}></Route>
           <Route path="/details" element={<ProductDetails />}></Route>
           <Route path="/contact" element={<ContactUs />}></Route>
-          <Route path="/categories" element={<Categories />}></Route>
+          <Route path="/categories" element={<Categories history={history} />}></Route>
           <Route path="/profile" element={<Profile />}></Route>
         </Routes>
         <Footer />

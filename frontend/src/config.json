@@ -1,0 +1,4 @@
+{
+    "LocalAPI": "http://localhost:8000/api",
+    "OfficialAPI": "http://134.209.150.190/api"
+}
