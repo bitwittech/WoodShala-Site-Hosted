@@ -15,3 +15,31 @@ body {
 code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
+html {
+    font-size: 80% !important;
+}
+
+
+/* // utility alert */
+
+
+
+.alert {
+    font-size: 1.2rem !important;
+    font-weight : 400 !important;
+}
+
+.snackbar div {
+    display: flex !important;
+    align-items: center !important;
+}
+
+@media  screen and (max-width: 500px) {
+    .alert {
+        font-size: 1.5rem !important;
+    }
+    html {
+        font-size: 90% !important;
+    }
+}
