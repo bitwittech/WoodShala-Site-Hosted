@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import {Link,useParams } from "react-router-dom";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Carousel from "react-multi-carousel";
 //mui
@@ -48,116 +48,27 @@ export default function Categories(props) {
   // history
   const history = props.history;
 
-  // filer params
-  const search = useLocation().search;
-  const filter = new URLSearchParams(search).get('filter') || undefined;
+  // filter params
+  const filter = useParams();
 
-  // responsive oject for Slider
-  const responsive = {
-    desktop: {
-      breakpoint: { max: 3000, min: 1024 },
-      items: 3,
-    },
-    tablet: {
-      breakpoint: { max: 800, min: 600 },
-      items: 2,
-    },
-    mobile: {
-      breakpoint: { max: 600, min: 0 },
-      items: 1,
-    },
-  };
+  // // responsive oject for Slider
+  // const responsive = {
+  //   desktop: {
+  //     breakpoint: { max: 3000, min: 1024 },
+  //     items: 3,
+  //   },
+  //   tablet: {
+  //     breakpoint: { max: 800, min: 600 },
+  //     items: 2,
+  //   },
+  //   mobile: {
+  //     breakpoint: { max: 600, min: 0 },
+  //     items: 1,
+  //   },
+  // };
 
   // store
   const { state, dispatch } = Store();
-
-
-
-  // use Effect
-  useEffect(() => {
-    
-    if (state.Auth.isAuth) {
-      getCartItem(state.Auth.CID)
-        .then((response) => {
-          if (localStorage.getItem('cart') !== null)
-            response.data.concat(JSON.parse(localStorage.getItem('cart')).items)
-
-          // console.log(response.data)
-          dispatch({
-            type: AddCartItem,
-            payload: { items: response.data }
-          })
-        })
-    }
-
-    fetchMoreData();
-
-  }, [state.Auth.isAuth])
-
-  const categories = [
-    {
-      image: living,
-      name: "Living",
-      price: 12000,
-    },
-    {
-      image: wfh,
-      name: "Work From Home",
-      price: 15000,
-    },
-    {
-      image: bedroom,
-      name: "Bedroom",
-      price: 20000,
-    },
-    {
-      image: dining,
-      name: "Dining",
-      price: 12000,
-    },
-    {
-      image: living,
-      name: "Living",
-      price: 12000,
-    },
-    {
-      image: wfh,
-      name: "Work From Home",
-      price: 15000,
-    },
-    {
-      image: bedroom,
-      name: "Bedroom",
-      price: 20000,
-    },
-    {
-      image: dining,
-      name: "Dining",
-      price: 12000,
-    },
-    {
-      image: living,
-      name: "Living",
-      price: 12000,
-    },
-    {
-      image: wfh,
-      name: "Work From Home",
-      price: 15000,
-    },
-    {
-      image: bedroom,
-      name: "Bedroom",
-      price: 20000,
-    },
-    {
-      image: dining,
-      name: "Dining",
-      price: 12000,
-    },
-  ];
-
-
 
   // states
   const [items, setItems] = useState([])
@@ -170,37 +81,133 @@ export default function Categories(props) {
     filter : filter
   });
 
-
   // State
   const [filterShow, setFilter] = useState(false);
 
-  // style 
-  const styleScroller = {
-    display: 'flex',
-    justifyContent: "center",
-    alignItem: 'center',
-    minWidth: '100%',
-    flexDirection: 'column',
-    overflow: 'hidden !important',
-    margin: 'auto'
+  // // style 
+  // const styleScroller = {
+  //   display: 'flex',
+  //   justifyContent: "center",
+  //   alignItem: 'center',
+  //   minWidth: '100%',
+  //   flexDirection: 'column',
+  //   overflow: 'hidden !important',
+  //   margin: 'auto'
 
-  }
+  // }
+
+  // use Effect
+  useEffect(() => {
+    
+    if (state.Auth.isAuth) {
+      getCartItem(state.Auth.CID)
+        .then((response) => {
+          if (localStorage.getItem('cart') !== null)
+            response.data.concat(JSON.parse(localStorage.getItem('cart')).items)
+
+          // (response.data)
+          dispatch({
+            type: AddCartItem,
+            payload: { items: response.data }
+          })
+        })
+    }
+
+    fetchMoreData();
+
+  }, [state.Auth.isAuth,filter])
+
+  
+
+  // const categories = [
+  //   {
+  //     image: living,
+  //     name: "Living",
+  //     price: 12000,
+  //   },
+  //   {
+  //     image: wfh,
+  //     name: "Work From Home",
+  //     price: 15000,
+  //   },
+  //   {
+  //     image: bedroom,
+  //     name: "Bedroom",
+  //     price: 20000,
+  //   },
+  //   {
+  //     image: dining,
+  //     name: "Dining",
+  //     price: 12000,
+  //   },
+  //   {
+  //     image: living,
+  //     name: "Living",
+  //     price: 12000,
+  //   },
+  //   {
+  //     image: wfh,
+  //     name: "Work From Home",
+  //     price: 15000,
+  //   },
+  //   {
+  //     image: bedroom,
+  //     name: "Bedroom",
+  //     price: 20000,
+  //   },
+  //   {
+  //     image: dining,
+  //     name: "Dining",
+  //     price: 12000,
+  //   },
+  //   {
+  //     image: living,
+  //     name: "Living",
+  //     price: 12000,
+  //   },
+  //   {
+  //     image: wfh,
+  //     name: "Work From Home",
+  //     price: 15000,
+  //   },
+  //   {
+  //     image: bedroom,
+  //     name: "Bedroom",
+  //     price: 20000,
+  //   },
+  //   {
+  //     image: dining,
+  //     name: "Dining",
+  //     price: 12000,
+  //   },
+  // ];
+
 
   // fetch more item
+  
   const fetchMoreData = async () => {
 
-    getProducts(meta)
+    // (meta)
+    // (filter)
+
+    getProducts({page : filter ===  meta.filter ? meta.page  : 1, filter : filter})
       .then((data) => {
         if (data.data.length > 0) {
-          setMeta({ ...meta, page: meta.page + 1 ,filter})
+          setMeta({ ...meta,hasMore: true, page: meta.page + 1 ,filter})
+          if(filter !== meta.filter)
+          {
+            setItems(data.data)
+            setMeta({ ...meta,hasMore: true, page: 2 ,filter})
+          }
+          else
           return setItems([...new Set([...items.concat(data.data)])])
         }
         else {
-          setMeta({ ...meta, page: 1, hasMore: false })
+          setMeta({ ...meta, page: 1, hasMore: false, filter : '' })
         }
       })
       .catch((err) => {
-        console.log(err)
+        // (err)
       })
   }
 
@@ -349,11 +356,21 @@ export default function Categories(props) {
   return (
     <>
       <title>Categories</title>
-{console.log(meta)}
+{/* {(meta)} */}
       {/* Main Container */}
       <Grid container sx={{ padding: "1%" }}>
+
+
+      {/* Banner */}
+      <Grid container className="productBanner">
+        <Grid item xs={12}>
+          <Typography variant="h1">Products</Typography>
+        </Grid>
+      </Grid>
+      {/* Banner Ends */}
+
         {/* sub categories details  */}
-        <Grid item xs={12} className="subInfo">
+        {/* <Grid item xs={12} className="subInfo">
           <Typography align="center" variant="h3">
             Furniture
             <Typography variant="body1">
@@ -362,12 +379,12 @@ export default function Categories(props) {
               neque consectetur.
             </Typography>
           </Typography>
-        </Grid>
+        </Grid> */}
 
         {/* sub categories details ends */}
 
         {/* carousal for sub cat */}
-        <Grid item xs={12} className="subCatContainer">
+        {/* <Grid item xs={12} className="subCatContainer">
           <Carousel keyBoardControl={true} ssr={true} responsive={responsive}>
             {categories.map((item, index) => {
               return (
@@ -390,7 +407,7 @@ export default function Categories(props) {
               );
             })}
           </Carousel>
-        </Grid>
+        </Grid> */}
         {/* carousal for sub cat ends */}
 
         {/* filter sec */}
@@ -659,16 +676,18 @@ export default function Categories(props) {
 
         {/* product container */}
         <Grid className="productContainer" item xs={12} md={10}>
-          {/* {console.log(state.AddCartItem)} */}
+          {/* {(state.AddCartItem)} */}
 
           <InfiniteScroll
             dataLength={items.length}
             next={fetchMoreData}
             hasMore={meta.hasMore}
-            style={styleScroller}
+            // style={styleScroller}
             loader={<center style={{ padding: '10px' }}><CircularProgress /></center>}
           >
-            <Grid container className='innerProductWrap' >
+            <Grid container 
+            className='innerProductWrap' 
+            >
               {items.map((item, index) => {
                 return (
                   <Grid
@@ -677,29 +696,27 @@ export default function Categories(props) {
                     className="productCard"
                     xs={window.innerWidth <= '600' ? 10 : 5.8}
                     sx={{ boxShadow: 2, maxHeight: '100%', mb : 3 }}
-                    md={3.87}
-
+                    md={2.9}
                   >
                     <Grid container>
                       <Grid item xs={12}
-                        onClick={() => history(`/details?SKU=${item.SKU}`)}
-
+                        onClick={() => history(`/details/${item.SKU}/${item.product_title}/${item.category_name}`)}
                       >
                         <img src={item.featured_image || item.product_image[0] || defaultIMG} alt="product_Images" />
                       </Grid>
-                      <Grid item xs={9}>
+                      <Grid item xs={8.8}>
                         <Box className="productInfo">
-                          <Typography variant="h5" >{item.product_title}</Typography>
-                          <Typography variant="body2">
+                          <Typography variant="h5" className = 'title'>{item.product_title}</Typography>
+                          {/* <Typography variant="body2">
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Est harum natus error facilis similique officiis ea nisi architecto explicabo tenetur Aspernatur?
-                          </Typography>
+                          </Typography> */}
                           <Typography variant="h5">{item.discount_limit}% Off</Typography>
                           <Typography variant="h6"><s>Rs.{item.MRP}</s></Typography>
                           <Typography variant="h5">Rs.{item.selling_price}</Typography>
                         </Box>
                       </Grid>
-                      <Grid item xs={3}>
-                        <Box className="buttonAction">
+                      <Grid item xs={3.2}>
+                        <Box className="buttonAction" sx = {{display : 'flex'}}>
                           {
                             state.AddCartItem.items.filter((row) => { return row.product_id === item.SKU }).length > 0 ?
                               <IconButton onClick={() => removeItemFromCart(item)}><ShoppingCartIcon /></IconButton> :

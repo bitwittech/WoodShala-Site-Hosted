@@ -1,3 +1,19 @@
+.productBanner {
+    justify-content: center;
+    align-items: center;
+    background-image: linear-gradient(rgba(250, 243, 230, 0.644), rgba(250, 243, 230, 0.678)), url('../images/cart/cartHead.png');
+    background-size: cover;
+    height: fit-content;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 7% 0% !important;
+    text-align: center;
+    font-weight: 500 !important;
+    color: #88250E;
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 2%;
+}
+
 .subInfo {
     padding: 3% 10%;
 }
@@ -19,6 +35,7 @@
 
 .productContainer {
     display: flex;
+    width: 100%;
     justify-content: center;
     align-items: center;
     padding: 0% 1%;
@@ -34,15 +51,38 @@
 .productCard {
     cursor: pointer;
     padding: 1%;
+    max-height: 400px;
+    min-height: 400px;
 }
 
 .productCard img {
     width: 100%;
-    height: 250px;
+    min-height: 250px;
+    max-height: 250px;
 }
 
 .hamFilterPanel {
     display: none;
+}
+
+.title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    /* number of lines to show */
+    line-clamp: 2;
+    min-height: 2.9em;
+    max-height: 2.9em;
+    -webkit-box-orient: vertical;
+}
+
+.infinite-scroll-component__outerdiv {
+    width: 100% !important;
+}
+
+a {
+    text-decoration: none;
 }
 
 @media screen and (max-width: 800px) {

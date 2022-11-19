@@ -6,14 +6,15 @@ import {
   Typography,
   IconButton,
   TextField,
-  InputAdornment,
+  Autocomplete,
   Tabs,
   Tab,
   Box,
-  Link,
   Drawer,
   ListItemIcon
 } from "@mui/material";
+
+import {Link} from 'react-router-dom'
 
 // icon
 import FacebookOutlinedIcon from "../../asset/images/navbar/facebook.png";
@@ -53,15 +54,22 @@ import "../../asset/css/navbar.css";
 import { Store } from '../../store/Context'
 import { LogBox, Auth, Notify } from '../../store/Types'
 
+// services 
+import {getSearchList} from '../../service/service'
+
 export default function Navbar(props) {
 // store 
   const { state, dispatch } = Store();
 
   // stats for ham burgher icon 
   const [Ham, setHam] = useState(false);
-
   const [anchor, setAnchorEl] = useState(null);
 
+  // state for search
+  const [search,setSearch] = useState({
+    searchList : [],
+    searchParams : undefined
+})
 
   
   const handleProfileIconClick = (event) => {
@@ -81,16 +89,17 @@ export default function Navbar(props) {
     setAnchorEl(null);
   };
 
-  const navBarComponent = ["/", 
-  "/categories",
-  "/categories",
-  "/categories",
-  "/categories",
-  "/categories",
-  "/categories",
-  "/categories",
-  "/categories",
-  "/categories",
+  const navBarComponent = [
+  '/', 
+  '/product/Bajot',
+  '/product/Animal Figurine',
+  '/product/Coaster',
+  '/product/Wall Decor',
+  '/product/Chair',
+  '/product/Candle Holder',
+  '/product/Clock',
+  '/product',
+  
 ];
   const navBarImage = [
     home,
@@ -106,19 +115,19 @@ export default function Navbar(props) {
 
   const navBarLabel = [
     'Home',
-    'Furniture',
-    'Kitchen Items',
-    'Gifting',
-    'Exclusive',
-    'Useful Products',
-    'Traditional',
-    'Company',
+    'Bajot',
+    'Animal Figurine',
+    'Coaster',
+    'Wall Decor',
+    'Chair',
+    'Candle Holder',
+    'Clock',
     'Browse All',];
 
   // for nav route
   const handleChange = (e, newVal) => {
     props.history(newVal);
-
+    // window.location.reload()
   };
 
 
@@ -188,8 +197,40 @@ export default function Navbar(props) {
     );
   }
 
+  // load new searchList
+const handleSearch = async (e) => {
+  const delayDebounceFn = setTimeout(() => {
+    getSearchList(e.target.value)
+    .then((res)=>{
+      // (res.data)
+      setSearch({
+        searchParams : e.target.value,
+        searchList : res.data || []
+      });
+    })
+    .catch((err)=>{
+      setSearch({
+        searchParams : undefined,
+        searchList : []
+      })
+      ('error for Navbar',err);
+    })
+  }, 3000)
+
+  return () => clearTimeout(delayDebounceFn)
+  }
+
+  // firing search 
+  const fireSearchQuery = (e)=>{
+if (e.key === 'Enter')
+   { return props.history(`/product/${e.target.value}/${e.target.value}`)}
+
+  //  return props.history
+  }
+
   return (
     <>
+    {/* // this component cortarolll the dat persistance */}
       <PersistData />
       <Grid container className="nav">
         {/* Black Top bar */}
@@ -287,7 +328,7 @@ export default function Navbar(props) {
                     
                   >
                     {
-                      navBarLabel.map((tag,index)=><Tab
+                      navBarLabel.map((tag,index)=><Tab key = {index}
                       wrapped
                       label={tag}
                       icon={<img alt='home' src={navBarImage[index]} />}
@@ -308,14 +349,31 @@ export default function Navbar(props) {
         {/* hamburger ends */}
 
 
-        {/* main-1 Tab */}
+        {/* main-1 search bar Tab */}
         <Grid item xs={12}>
           <Grid container spacing={1} className="main-1">
             <Grid item xs={12} md={3} className="center">
               <img src={logo} style = {{cursor : 'pointer'}} onClick= {()=>{props.history('/')}} alt="logo.png"></img>
             </Grid>
             <Grid item xs={10} md={6} className="center searchBar">
-              <TextField
+            <Autocomplete
+              disablePortal
+              size = 'small'
+              fullWidth
+              // autoComplete 
+              autoHighlight
+              onKeyPress = {fireSearchQuery}
+              clearOnEscape
+              id="combo-box-demo"
+              options={search.searchList.map((row)=>{return row.product_title})}
+              // sx={{ width: 300 }}
+              renderInput={(params) => <TextField onKeyUpCapture={handleSearch} 
+              // value = {search.searchParams || ''} 
+              // onChange = {} 
+              {...params} 
+              label="Search" />}
+            />
+              {/* <TextField
                 id="input-with-icon-textfield"
                 size="small"
                 variant="outlined"
@@ -333,7 +391,7 @@ export default function Navbar(props) {
                     </InputAdornment>
                   ),
                 }}
-              />
+              /> */}
             </Grid>
             <Grid item xs={12} md={3} className="center">
               <IconButton color="primary" onClick={handleProfileIconClick }>
@@ -358,10 +416,11 @@ export default function Navbar(props) {
             </Grid>
           </Grid>
         </Grid>
-        {/* ends main-1 Tab */}
+        {/* ends main-1 search bar Tab */}
 
         {/* main-2 link container */}
         <Grid item xs={12} className="main-2">
+          {/* {(window.location.pathname.replace('%20',''))} */}
           <Tabs
             scrollButtons
             allowScrollButtonsMobile
@@ -369,13 +428,13 @@ export default function Navbar(props) {
             variant="scrollable"
             onChange={handleChange}
             value={
-              navBarComponent.includes(window.location.pathname) &&
-              window.location.pathname
+            navBarComponent.includes(window.location.pathname.replace('%20',' ').replace('%22',' ')) && window.location.pathname.replace('%20',' ').replace('%22',' ') 
             }
             color="primary"
           >
 
     {navBarLabel.map((tab,index)=><Tab
+    key = {index}
               wrapped
               label={tab}
               component={Link}

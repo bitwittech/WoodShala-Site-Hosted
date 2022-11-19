@@ -55,7 +55,7 @@ export const getCustomerAddress = async (CID) => {
 
 // for update Customer  details  
 export const updateCustomer = async (data) => {
-  console.log(data)
+  // (data)
   return await axios.patch(`https://admin.woodshala.in/api/updateCustomer`, data,
     {
       headers: {
@@ -71,7 +71,27 @@ export const updateCustomer = async (data) => {
 // ======================== CURD for product =================================
 
 export const getProducts = async (data) => {
-  return await axios.get(`${API}/getProducts?pageNumber=${data.page}&filter=${data.filter}`,
+  // (data) 
+  return await axios.get(`${API}/getProducts?pageNumber=${data.page}&product_title=${data.filter.product_title}&category_name=${data.filter.category_name}`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    }
+  );
+}
+
+export const getRelatedProduct = async (data) => {
+  return await axios.get(`${API}/getRelatedProduct?filter=${JSON.stringify(data)}`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    }
+  );
+}
+export const getSearchList = async (data) => {
+  return await axios.get(`${API}/getSearchList?filter=${data}`,
     {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
