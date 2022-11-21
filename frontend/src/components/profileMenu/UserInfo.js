@@ -9,16 +9,25 @@ import EditIcon from '@mui/icons-material/Edit';
 //services
 import { getCustomer, updateCustomer } from "../../service/service";
 // Store
-import { Store } from "../../store/Context";
-// types 
-import { Auth, Notify } from "../../store/Types";
+// import { Store } from "../../store/Context";
+// // types 
+// import { Auth, Notify } from "../../store/Types";
+
+// Redux 
+import {useDispatch,useSelector} from 'react-redux'
+
+// action
+import {setAlert,setAuth} from '../../Redux/action/action'
 
 const UserInfo = () => {
     // context
-    const {
-        state,
-        dispatch,
-    } = Store();
+    // const {
+    //     state,
+    //     dispatch,
+    // } = Store();
+
+    const state = useSelector(state=>state)
+    const dispatch = useDispatch()
 
     // state for value 
     const [formVal, SetFormVal] = useState({
@@ -40,22 +49,22 @@ const UserInfo = () => {
 
 
     useEffect(() => {
-        if (state.Auth.isAuth) {
-            getCustomer(state.Auth.CID)
+        if (state.auth.isAuth) {
+            getCustomer(state.auth.CID)
             .then((response) => {
-                console.log(response)
+                // (response)
                 SetFormVal({ ...formVal, ...response.data });
             })
             .catch((err) => {
-                console.log(err);
+                // (err);
             });
         }
 
-    }, [state.Auth.isAuth]);
+    }, [state.auth.isAuth]);
 
     // handleUpdated values
     const handleVal = async (e) => {
-        console.log(e.target.name)
+        // (e.target.name)
         if (e.target.name !== 'profile_image') {
             SetFormVal({
                 ...formVal, [e.target.name]: e.target.value
@@ -96,23 +105,21 @@ const UserInfo = () => {
 
         res
             .then((response) => {
-                console.log(response)
+                // (response)
 
-                dispatch({
-                    type: Notify, payload: {
+                dispatch(setAlert( {
                         open: true,
                         message: 'Changes Saved !!!',
                         variant: 'success',
-                    }
-                })
+                }))
 
-                dispatch({
-                    type: Auth,
-                    payload:
-                    {
-                        ...formVal
-                    }
-                })
+                dispatch(setAuth({
+                    isAuth: false,
+                    username: formVal.username,
+                    email: formVal.email,
+                    CID: formVal.CID,
+                    token: state.auth.token
+                }))
 
                 setController({
                     ...controller,
@@ -125,16 +132,13 @@ const UserInfo = () => {
 
             })
             .catch((err) => {
-                console.log(err)
-                dispatch({
-                    type: Notify,
-                    payload:
+                // (err)
+                dispatch(setAlert(
                     {
                         open: true,
                         variant: 'error',
                         message: 'Something Went Wrong !!!',
-                    }
-                })
+                }))
 
                 setController({
                     ...controller,

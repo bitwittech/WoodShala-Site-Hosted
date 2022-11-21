@@ -43,24 +43,28 @@ import {
 // APis function 
 import { getProductDetails, addCartItem, getRelatedProduct } from '../service/service'
 
-// global state 
-import { Store } from '../store/Context'
-import { AddCartItem, Notify } from '../store/Types'
 
+// redux 
+import {useDispatch,useSelector} from 'react-redux';
+// action
+import {addItem,removeItem,setAlert} from '../Redux/action/action'
 
 export default function ProductDetails(props) {
 
   // store 
-  const { state, dispatch } = Store();
+  // const { state, dispatch } = Store();
+
+  // state
+  const state = useSelector(state=>state);
+
+  //redux
+  const dispatch = useDispatch();
 
   // state
   const [imageIndex, setIndex] = useState(0); // use for updating the images
   const [ratting, setRatting] = useState(2);
   const [expanded, setExpanded] = useState("panel1");
   const [value, setValue] = useState(0);
-
-
-
 
   // useParams search parameters
   const { SKU, title, category } = useParams();
@@ -213,83 +217,55 @@ export default function ProductDetails(props) {
   }
 
   // function for adding the product to cart 
-  const addToCart = async (item) => {
-    let flag = false;
-    const modifiedData = state.AddCartItem.items.map((set) => {
-
-      if (item.SKU === set.product_id) {
-        flag = true;
-        return {
-          CID: state.Auth.CID || 'Not Logged In',
-          product_id: set.product_id,
-          quantity: data.quantity
-        }
-      }
-      else return set
-
-    })
-
-    if (flag === false) modifiedData.push({
-      CID: state.Auth.CID || 'Not Logged In',
-      product_id: item.SKU,
-      quantity: data.quantity || 1
-    })
+  const addToCart = async () => {
 
     // server side 
-    if (state.Auth.isAuth) {
+    if (state.auth.isAuth) {
       await addCartItem({
-        CID: state.Auth.CID,
-        product_id: item.SKU,
+        CID: state.auth.CID,
+        product_id: data.SKU,
         quantity: data.quantity || 1,
       })
         .then((response) => {
           // for client side 
-          dispatch(
-            {
-              type: AddCartItem,
-              payload: {
-                items: [...modifiedData]
-              }
-            }
-          )
-          return dispatch({
-            type: Notify,
-            payload: {
+          dispatch(removeItem(data.SKU));
+
+          dispatch(addItem({
+            product_id : data.SKU,
+            quantity : data.quantity,
+            CID : state.auth.CID
+          }));
+
+          return dispatch(setAlert({
               variant: 'success',
               message: response.data.message,
               open: true
-            }
-          })
+            }))
         })
         .catch((err) => {
-          return dispatch({
-            type: Notify,
-            payload: {
+          return dispatch(setAlert({
               variant: 'error',
               message: 'Something Went Wrong !!!',
               open: true
-            }
-          })
+          }))
         })
     }
     else {
       // for client side 
-      dispatch(
-        {
-          type: AddCartItem,
-          payload: {
-            items: [...modifiedData]
-          }
-        }
-      )
-      return dispatch({
-        type: Notify,
-        payload: {
+      dispatch(removeItem(data.SKU));
+
+      dispatch(addItem({
+        product_id : data.SKU,
+        quantity : data.quantity,
+        CID : 'Not Logged In'
+      }));
+
+
+      return dispatch(setAlert({
           variant: 'success',
           message: 'Item added to the cart !!!',
           open: true
-        }
-      })
+      }))
 
     }
   }
@@ -436,7 +412,7 @@ export default function ProductDetails(props) {
               <Grid item xs={12} className="contentSec" md={6}>
                 <Grid container>
                   <Grid item xs={12}>
-                    <Typography sx={{ fontWeight: 350 }} variant="h4">
+                    <Typography sx={{ fontWeight: 350 }} variant="h3">
                       {/* product title */}
                       {data.product_title}
                     </Typography>
@@ -453,18 +429,18 @@ export default function ProductDetails(props) {
                       />
                       <Box className="wishlist">
                         <FavoriteBorderIcon />
-                        <Typography variant="body2">Add To Wishlist</Typography>
+                        <Typography variant="h6">Add To Wishlist</Typography>
                       </Box>
                     </Box>
                     <Box className="priceSec">
-                      <Typography variant="h6">
+                      <Typography variant="h4" sx = {{fontWeight : 'bolder'}}>
                         {/* Price */}
-                        Rs.{data.selling_price}
+                        &#x20B9; {data.selling_price-(data.selling_price/100)*data.discount_limit}
                       </Typography>
-                      <Typography variant="body1">
+                      {/* <Typography variant="body1"> */}
                         {/* MRP */}
-                        MRP : <del>{data.MRP}</del>
-                      </Typography>
+                        {/* MRP : <del>{data.MRP}</del> */}
+                      {/* </Typography> */}
                       <Typography sx={{ color: "#FD0606" }} variant="h6">
                         {/* discount */}
                         {data.discount_limit}% Off
@@ -473,17 +449,17 @@ export default function ProductDetails(props) {
                   </Grid>
                   {/* <Grid item xs={12}>
                 <Box className="coupon">
-                  <Typography sx={{ color: "#ad0000" }} variant="body2">
+                  <Typography sx={{ color: "#ad0000" }} variant="h6">
                     To get this price,
                     <span>
                       {" "}
                       USE CODE : <b>MOM</b>
                     </span>
                   </Typography>
-                  <Typography variant="button">Offer Extended</Typography>
+                  <Typography variant="body1">Offer Extended</Typography>
                   <br></br>
                   <Divider />
-                  <Typography variant="caption">
+                  <Typography variant="body1">
                     Shopping For First Time?
                   </Typography>
                   <Divider />
@@ -493,7 +469,7 @@ export default function ProductDetails(props) {
                 <Box>
                   <Typography
                     sx={{ color: "#FD0606", fontWeight: 400 }}
-                    variant="body2"
+                    variant="h6"
                   >
                     Special Offers
                   </Typography>
@@ -512,7 +488,7 @@ export default function ProductDetails(props) {
                     >
                       <Typography sx={{ fontWeight: 400 }} variant="body1">
                         Holi Offer
-                        <Typography variant="caption">
+                        <Typography variant="body1">
                           {" "}
                           Apply Code HOLI30
                         </Typography>
@@ -541,7 +517,7 @@ export default function ProductDetails(props) {
                     >
                       <Typography sx={{ fontWeight: 400 }} variant="body1">
                         Diwali Offer
-                        <Typography variant="caption">
+                        <Typography variant="body1">
                           {" "}
                           Apply Code DIW30
                         </Typography>
@@ -561,7 +537,7 @@ export default function ProductDetails(props) {
               </Grid> */}
                   {/* <Grid item xs={12}>
                 <Box>
-                  <Typography sx={{ fontWeight: 400 }} variant="body2">
+                  <Typography sx={{ fontWeight: 400 }} variant="h6">
                     Size
                   </Typography>
                 </Box>
@@ -603,87 +579,87 @@ export default function ProductDetails(props) {
                 </Box>
               </Grid> */}
                   <Grid className="pd" item xs={12}>
-                    <Typography sx={{ fontWeight: 400 }} variant="body2">
+                    <Typography sx={{ fontWeight: 400 }} variant="h6">
                       Product Details
                     </Typography>
                     <Divider />
                     <Stack sx={{ paddingTop: "2%" }}>
-                      <Typography variant="caption">
+                      <Typography variant="body1">
                         SKU
-                        <Typography sx={{ float: "right" }} variant="caption">{data.SKU}</Typography>
+                        <Typography sx={{ float: "right" }} variant="body1">{data.SKU}</Typography>
                       </Typography>
-                      <Typography variant="caption">
+                      <Typography variant="body1">
                         Category
-                        <Typography sx={{ float: "right" }} variant="caption">{data.category_name}</Typography>
+                        <Typography sx={{ float: "right" }} variant="body1">{data.category_name}</Typography>
                       </Typography>
-                      <Typography variant="caption">
+                      <Typography variant="body1">
                         Sub Category
-                        <Typography sx={{ float: "right" }} variant="caption">{data.sub_category_name}</Typography>
+                        <Typography sx={{ float: "right" }} variant="body1">{data.sub_category_name}</Typography>
                       </Typography>
-                      {/* <Typography variant="caption">
+                      {/* <Typography variant="body1">
                     SEO Title
-                    <Typography sx={{ float: "right" }} variant="caption">{data.seo_title}</Typography>
+                    <Typography sx={{ float: "right" }} variant="body1">{data.seo_title}</Typography>
                   </Typography>
-                  <Typography variant="caption">
+                  <Typography variant="body1">
                     SEO Keyword
-                    <Typography sx={{ float: "right" }} variant="caption">{data.seo_keyword}</Typography>
+                    <Typography sx={{ float: "right" }} variant="body1">{data.seo_keyword}</Typography>
                   </Typography> */}
-                      <Typography variant="caption">
+                      <Typography variant="body1">
                         Matrial
-                        <Typography sx={{ float: "right" }} variant="caption">{data.primary_material}</Typography>
+                        <Typography sx={{ float: "right" }} variant="body1">{data.primary_material}</Typography>
                       </Typography>
-                      <Typography variant="caption">
-                        Weight Capacity<Typography sx={{ float: "right" }} variant="caption">{data.weight_capacity}</Typography>
+                      <Typography variant="body1">
+                        Weight Capacity<Typography sx={{ float: "right" }} variant="body1">{data.weight_capacity}</Typography>
                       </Typography>
-                      <Typography variant="caption">
-                        Manufacturing Time<Typography sx={{ float: "right" }} variant="caption">{data.manufacturing_time}</Typography>
+                      <Typography variant="body1">
+                        Manufacturing Time<Typography sx={{ float: "right" }} variant="body1">{data.manufacturing_time}</Typography>
                       </Typography>
-                      <Typography variant="caption">
-                        Polish Time<Typography sx={{ float: "right" }} variant="caption">{data.polish_time}</Typography>
+                      <Typography variant="body1">
+                        Polish Time<Typography sx={{ float: "right" }} variant="body1">{data.polish_time}</Typography>
                       </Typography>
-                      <Typography variant="caption">
-                        Range<Typography sx={{ float: "right" }} variant="caption">{data.range}</Typography>
+                      <Typography variant="body1">
+                        Range<Typography sx={{ float: "right" }} variant="body1">{data.range}</Typography>
                       </Typography>
                     </Stack>
-                    <Typography sx={{ fontWeight: 400, mt: 1 }} variant="body2">
+                    <Typography sx={{ fontWeight: 400, mt: 1 }} variant="h6">
                       Price Details
                     </Typography>
                     <Divider />
                     <Stack sx={{ paddingTop: "2%" }}>
-                      <Typography variant="caption">
+                      <Typography variant="body1">
                         Selling Price
-                        <Typography sx={{ float: "right" }} variant="caption">{data.selling_price}</Typography>
+                        <Typography sx={{ float: "right" }} variant="body1">{data.selling_price}</Typography>
                       </Typography>
-                      <Typography variant="caption">
-                        Showroom Price<Typography sx={{ float: "right" }} variant="caption">{data.showroom_price}</Typography>
+                      <Typography variant="body1">
+                        Showroom Price<Typography sx={{ float: "right" }} variant="body1">{data.showroom_price}</Typography>
                       </Typography>
-                      <Typography variant="caption">
-                        Discount <Typography sx={{ float: "right" }} variant="caption">{data.discount_limit}%</Typography>
+                      <Typography variant="body1">
+                        Discount <Typography sx={{ float: "right" }} variant="body1">{data.discount_limit}%</Typography>
                       </Typography>
-                      <Typography variant="caption">
-                        Tax <Typography sx={{ float: "right" }} variant="caption">{data.tax_rate}%</Typography>
+                      <Typography variant="body1">
+                        Tax <Typography sx={{ float: "right" }} variant="body1">{data.tax_rate}%</Typography>
                       </Typography>
-                      <Typography variant="caption">
-                        MRP <Typography sx={{ float: "right" }} variant="caption">{(data.selling_price) - (data.selling_price / 100 * data.discount_limit)}</Typography>
+                      <Typography variant="body1">
+                        MRP <Typography sx={{ float: "right" }} variant="body1">{(data.selling_price) - (data.selling_price / 100 * data.discount_limit)}</Typography>
                       </Typography>
                     </Stack>
-                    <Typography sx={{ fontWeight: 400, mt: 1 }} variant="body2">
+                    <Typography sx={{ fontWeight: 400, mt: 1 }} variant="h6">
                       Dimesion Details
                     </Typography>
                     <Divider />
                     <Stack sx={{ paddingTop: "2%" }}>
-                      <Typography variant="caption">
+                      <Typography variant="body1">
                         Dimensions (Inch)
-                        <Typography sx={{ float: "right" }} variant="caption">{data.length_main} L x {data.height} H x {data.breadth} B</Typography>
+                        <Typography sx={{ float: "right" }} variant="body1">{data.length_main} L x {data.height} H x {data.breadth} B</Typography>
                       </Typography>
-                      <Typography variant="caption">
-                        Package Length (Inch)<Typography sx={{ float: "right" }} variant="caption">{data.package_length}</Typography>
+                      <Typography variant="body1">
+                        Package Length (Inch)<Typography sx={{ float: "right" }} variant="body1">{data.package_length}</Typography>
                       </Typography>
-                      <Typography variant="caption">
-                        Package Height (Inch)<Typography sx={{ float: "right" }} variant="caption">{data.package_height}</Typography>
+                      <Typography variant="body1">
+                        Package Height (Inch)<Typography sx={{ float: "right" }} variant="body1">{data.package_height}</Typography>
                       </Typography>
-                      <Typography variant="caption">
-                        Package Breadth (Inch)<Typography sx={{ float: "right" }} variant="caption">{data.package_breadth}</Typography>
+                      <Typography variant="body1">
+                        Package Breadth (Inch)<Typography sx={{ float: "right" }} variant="body1">{data.package_breadth}</Typography>
                       </Typography>
                     </Stack>
                     <Box className="cartButtons">
@@ -726,7 +702,7 @@ export default function ProductDetails(props) {
                 </Typography>
               </Grid>
               <Grid item xs={12}>
-                <Typography sx={{ fontWeight: 100, padding: "1% 0%" }} component='span' variant="caption">
+                <Typography sx={{ fontWeight: 100, padding: "1% 0%" }} component='span' variant="body1">
                   Explore full product details here !!!
                 </Typography>
               </Grid>
@@ -748,8 +724,8 @@ export default function ProductDetails(props) {
                     <Stack sx={{ padding: "5%", paddingTop: '1%' }}>
                       {specification.map((item) => {
                         return <>
-                          <Typography variant="button">
-                            {item}<Typography sx={{ float: "right" }} variant="button">{data[item]}</Typography>
+                          <Typography variant="body1">
+                            {item}<Typography sx={{ float: "right" }} variant="body1">{data[item]}</Typography>
                           </Typography>
                           <Divider />
                         </>
@@ -772,9 +748,9 @@ export default function ProductDetails(props) {
                     <Stack sx={{ padding: "5%", paddingTop: '1%' }}>
                       {feature.map((item) => {
                         return <>
-                          <Typography variant="button">
+                          <Typography variant="body1">
                             {item}<Typography sx={{ float: "right", color: data[item] ? 'green' : 'red' }}
-                              variant="button">{data[item] ? 'true' : 'false'}</Typography>
+                              variant="body1">{data[item] ? 'true' : 'false'}</Typography>
                           </Typography>
                           <Divider />
                         </>
@@ -785,9 +761,9 @@ export default function ProductDetails(props) {
                     <Stack sx={{ padding: "5%", paddingTop: '1%' }}>
                       {miscellanous.map((item) => {
                         return <>
-                          <Typography variant="button">
+                          <Typography variant="body1">
                             {item}<Typography sx={{ float: "right" }}
-                              variant="button">{data[item]}</Typography>
+                              variant="body1">{data[item]}</Typography>
                           </Typography>
                           <Divider />
                         </>
@@ -798,9 +774,9 @@ export default function ProductDetails(props) {
                     <Stack sx={{ padding: "5%", paddingTop: '1%' }}>
                       {inventory.map((item) => {
                         return <>
-                          <Typography variant="button">
+                          <Typography variant="body1">
                             {item}<Typography sx={{ float: "right" }}
-                              variant="button">{data[item]}</Typography>
+                              variant="body1">{data[item]}</Typography>
                           </Typography>
                           <Divider />
                         </>
@@ -811,9 +787,9 @@ export default function ProductDetails(props) {
                     <Stack sx={{ padding: "5%", paddingTop: '1%' }}>
                       {seo.map((item) => {
                         return <>
-                          <Typography variant="button">
+                          <Typography variant="body1">
                             {item}<Typography sx={{ float: "right" }}
-                              variant="button">{data[item]}</Typography>
+                              variant="body1">{data[item]}</Typography>
                           </Typography>
                           <Divider />
                         </>
@@ -824,9 +800,9 @@ export default function ProductDetails(props) {
                     <Stack sx={{ padding: "5%", paddingTop: '1%' }}>
                       {extra.map((item) => {
                         return <>
-                          <Typography variant="button">
+                          <Typography variant="body1">
                             {item}<Typography sx={{ float: "right" }}
-                              variant="button">{data[item]}</Typography>
+                              variant="body1">{data[item]}</Typography>
                           </Typography>
                           <Divider />
                         </>
@@ -863,7 +839,7 @@ export default function ProductDetails(props) {
                       <Card
                         component={Link}
                         to={`/details/${article.SKU}/${article.product_title}/${article.category_name}`}
-                        className="card" key={index} sx={{ maxWidth: 280, minHeight: 300, maxHeight: 300, boxShadow: 2 }}>
+                        className="card" key={index} sx={{ maxWidth: 280, minHeight: 400, maxHeight: 400, boxShadow: 2 }}>
                         <CardActionArea>
                           <CardMedia
                             className="cardMedia"
@@ -873,11 +849,20 @@ export default function ProductDetails(props) {
                             alt="Product_image"
                           />
                           <CardContent>
-                            <Typography className='productTitle' variant="h5" component="div">
+                            <Typography className='productTitle' sx = {{fontWeight : 'bolder'}} variant="h6" component="div">
                               {article.product_title}
                             </Typography>
-                            <Typography variant="body" color="text.secondary">
-                              Rs.{article.selling_price || 0}
+                            <Typography sx = {{mt:1}} className='productTitle' variant="body1"  component="div">
+                              {article.product_description}
+                            </Typography>
+                            <Typography sx = {{mt:1}} variant="body1" >
+                               ({article.discount_limit}% OFF)
+                            </Typography>
+                            <Typography variant="h6" color="text.secondary">
+                              <del>&#8377; {article.selling_price}</del>
+                            </Typography>
+                            <Typography variant="h6" sx = {{fontWeight : 'bolder'}} color="text.secondary">
+                            &#8377; {article.selling_price-(article.selling_price/100)*article.discount_limit}
                             </Typography>
                           </CardContent>
                         </CardActionArea>

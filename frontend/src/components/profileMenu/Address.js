@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../../asset/css/profile.css";
 import {
     Grid, Button, TextField, Typography,
-    CircularProgress,
+    // CircularProgress,
     Box, IconButton,
     Backdrop,
     Modal,
@@ -15,24 +15,30 @@ import {
 
 
 //icon
-import SaveIcon from "@mui/icons-material/Save";
+// import SaveIcon from "@mui/icons-material/Save";
 import AddIcon from '@mui/icons-material/Add';
 // image
-import avatar from "../../asset/images/profile/avatar.svg";
-import EditIcon from '@mui/icons-material/Edit';
+// import avatar from "../../asset/images/profile/avatar.svg";
+// import EditIcon from '@mui/icons-material/Edit';
 //services
 import { getCustomerAddress, updateCustomer } from "../../service/service";
 // Store
-import { Store } from "../../store/Context";
+// import { Store } from "../../store/Context";
 // types 
-import { Auth, Notify } from "../../store/Types";
+// import { Auth, Notify } from "../../store/Types";
+// REdux 
+import {useSelector,useDispatch} from 'react-redux';
+import {setAlert} from '../../Redux/action/action'
 
 const Address = () => {
     // context
-    const {
-        state,
-        dispatch,
-    } = Store();
+    // const {
+    //     state,
+    //     dispatch,
+    // } = Store();
+
+    const state = useSelector(state=>state)
+    const dispatch = useDispatch()
 
     // satat for saved array data
     const [addressArray, setAddressArray] = useState([]);
@@ -43,18 +49,18 @@ const Address = () => {
 
     // for fetching the user Addresses  
     useEffect(() => {
-        if (state.Auth.isAuth) {
-            getCustomerAddress(state.Auth.CID)
+        if (state.auth.isAuth) {
+            getCustomerAddress(state.auth.CID)
                 .then((response) => {
-                    // console.log(response)
+                    // (response)
                     setAddressArray(response.data.address);
                 })
                 .catch((err) => {
-                    // console.log(err);
+                    // (err);
                 });
         }
 
-    }, [state.Auth.isAuth]);
+    }, [state.auth.isAuth]);
 
     // Address form
     const AddAddressModal = () => {
@@ -63,7 +69,7 @@ const Address = () => {
 
         useEffect(()=>{
             if(controller.index !== undefined){
-                // console.log(addressArray[controller.index])
+                // (addressArray[controller.index])
                 setData({
                  ...addressArray[controller.index]   
                 })
@@ -94,19 +100,19 @@ const Address = () => {
         // add Address 
         const handleAddress = (e) => {
             e.preventDefault()
-            // // console.log(data); 
+            // // (data); 
             
             let newAddress = [...addressArray, data]
 
             if(controller.index !== undefined){
                 newAddress.splice(controller.index,1)
             }
-            // console.log(newAddress)
+            // (newAddress)
 
             const FD  = new FormData();
 
             FD.append('address',JSON.stringify(newAddress));
-            FD.append('CID',state.Auth.CID);
+            FD.append('CID',state.auth.CID);
 
             const req = updateCustomer(FD)
 
@@ -116,37 +122,28 @@ const Address = () => {
                     setAddressArray([...newAddress])
                     setController({ ...controller, openModal: false, index : undefined })
 
-                    dispatch({
-                        type : Notify,
-                        payload : {
+                    dispatch(setAlert({
                             open :true,
                             variant : 'success',
                             message : 'Address Appended !!!'
-                        }
-                    })
+                    }))
                 }
                 else  {
-                    dispatch({
-                        type : Notify,
-                        payload : {
+                    dispatch(setAlert( {
                             open :true,
                             variant : 'error',
                             message : res.data.message || 'Something Went Wrong !!!'
-                        }
-                    })
+                    }))
                 }
 
             })
             .catch((err)=>{
-                // console.log(err)
-                dispatch({
-                    type : Notify,
-                    payload : {
+                // (err)
+                dispatch(setAlert({
                         open :true,
                         variant : 'error',
                         message : 'Something Went Wrong !!!'
-                    }
-                })
+                }))
             })
         }
 
@@ -296,11 +293,11 @@ const Address = () => {
         
         let data = addressArray
         data.splice(index,1)
-        // // console.log(data)
+        // // (data)
 // return 0;
         const FD  = new FormData();
         FD.append('address',JSON.stringify([...data]));
-        FD.append('CID',state.Auth.CID);
+        FD.append('CID',state.auth.CID);
 
         const req = updateCustomer(FD)
 
@@ -310,37 +307,30 @@ const Address = () => {
                 setAddressArray([...data])
                 setController({ ...controller, openModal: false })
 
-                dispatch({
-                    type : Notify,
-                    payload : {
+                dispatch(setAlert({
                         open :true,
                         variant : 'warning',
                         message : 'Address Removed'
-                    }
-                })
+                }))
             }
             else  {
-                dispatch({
-                    type : Notify,
-                    payload : {
+                dispatch(setAlert( {
                         open :true,
                         variant : 'error',
                         message : res.data.message || 'Something Went Wrong !!!'
-                    }
-                })
+                    
+                }))
             }
 
         })
         .catch((err)=>{
-            // console.log(err)
-            dispatch({
-                type : Notify,
-                payload : {
+            // (err)
+            dispatch(setAlert({
                     open :true,
                     variant : 'error',
                     message : 'Something Went Wrong !!!'
-                }
-            })
+                
+            }))
         })
     }
 
