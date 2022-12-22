@@ -1,31 +1,36 @@
-import React, {useEffect} from "react";
+import React, {useEffect, lazy,Suspense} from "react";
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import "./App.css";
+import "../src/asset/css/home.css";
 
 // MUI
 import { CssBaseline } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import FallBack from "./components/utility/FallBack"
 
 // utility 
-import Navbar from "./components/utility/Navbar"
-import Footer from "./components/utility/Footer"
-import SnakBar from "./components/utility/SnakBar"
+const Navbar =  lazy(()=>import("./components/utility/Navbar"))
+const Footer =  lazy(()=>import("./components/utility/Footer"))
+const SnakBar =  lazy(()=>import("./components/utility/SnakBar"))
+const NotFound =  lazy(()=>import("./components/utility/NotFound"))
+const Thanks =  lazy(()=>import("./components/utility/Thanks"))
+
 
 // context
 // import {Store} from './store/Context'
 // import {Auth} from './store/Types'
 
 // components
-import Home from "./components/Home";
-import Cart from "./components/Cart";
-import Checkout from "./components/Checkout";
-import ProductDetails from "./components/ProductDetails";
-import ContactUs from "./components/ContactUs";
-import Categories from "./components/Categories";
-import EntryPoint from "./components/EntryPoint";
-import Profile from "./components/Profile";
-import Verify from "./components/Verify";
-import Thanks from "./components/utility/Thanks";
+const Home = lazy(()=>import( "./components/Home"))
+const Cart = lazy(()=>import( "./components/Cart"))
+const Checkout = lazy(()=>import( "./components/Checkout"))
+const ProductDetails = lazy(()=>import( "./components/ProductDetails"))
+const ContactUs = lazy(()=>import( "./components/ContactUs"))
+const ProductList = lazy(()=>import( "./components/ProductList"))
+const EntryPoint = lazy(()=>import( "./components/EntryPoint"))
+const Profile = lazy(()=>import( "./components/Profile"))
+const Verify = lazy(()=>import( "./components/Verify"))
+const Catagories = lazy(()=>import( "./components/Catagories"))
 
 
 // global theme
@@ -64,20 +69,28 @@ function App() {
       <>
         {window.location.pathname !== '/verify' && <Navbar history={history} />}
         <Routes>
+
+          {/* Not found  */}
+          <Route path="*" element={<NotFound/>}/>
+
+          {/* // main routes  */}
           <Route path="/" element={<Home history={history}/>}></Route>
+          <Route path="/verify" element={<Verify history = {history}/>}></Route>
+          <Route path="/categories" element={<Catagories history = {history}/>}></Route>
+
+          {/* // page routes  */}
           <Route path="/home" element={<Home history={history} />}></Route>
           <Route path="/cart" element={<Cart history={history} />}></Route>
           <Route path="/checkout" element={<Checkout />}></Route>
           <Route path="/details/:SKU/:title/:category" element={<ProductDetails history={history} />}></Route>
           <Route path="/contact" element={<ContactUs />}></Route>
           <Route path="/profile" element={<Profile />}></Route>
-          <Route path="/verify" element={<Verify history = {history}/>}></Route>
 
           {/* // filter and Product page route */}
-          <Route path="/product/:category_name/:product_title/:selling_price" element={<Categories history={history} />}></Route>
-          <Route path="/product/:category_name/:product_title" element={<Categories history={history} />}></Route>
-          <Route path="/product/:category_name" element={<Categories history={history} />}></Route>
-          <Route path="/product" element={<Categories history={history} />}></Route>
+          <Route path="/product/:category_name/:product_title/:selling_price" element={<ProductList history={history} />}></Route>
+          <Route path="/product/:category_name/:product_title" element={<ProductList history={history} />}></Route>
+          <Route path="/product/:category_name" element={<ProductList history={history} />}></Route>
+          <Route path="/product" element={<ProductList history={history} />}></Route>
         </Routes>
         {window.location.pathname !== '/verify' && <Footer />}
       </>
@@ -86,6 +99,7 @@ function App() {
 
   return (
     <>
+    <Suspense fallback = {<FallBack/>}>
       <ThemeProvider theme={light}>
         <CssBaseline enableColorScheme>
           <BrowserRouter>
@@ -96,6 +110,7 @@ function App() {
           <SnakBar />
         </CssBaseline>
       </ThemeProvider>
+    </Suspense>
     </>
   );
 }
