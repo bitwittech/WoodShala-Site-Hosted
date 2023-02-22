@@ -11,6 +11,7 @@ const review = mongoose.Schema({
   yourTube_url: { type: String },
   reviewer_name: { type: String },
   reviewer_email: { type: String },
+  hide: { type: Boolean, default: false },
   date: { type: Date, default: Date.now() },
 });
 
