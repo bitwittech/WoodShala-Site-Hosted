@@ -35,7 +35,7 @@ app.use('/api/', require('./server/routes'))
 app.use(express.static("frontEnd/build"));
 
 app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'frontEnd', 'build', 'index.html'))
+  res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'))
 })
 
 
