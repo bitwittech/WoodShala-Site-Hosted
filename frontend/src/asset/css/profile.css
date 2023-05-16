@@ -1,0 +1,123 @@
+.tileContainer{
+    display: flex;
+    padding: 5% 7%;
+    justify-content: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+}
+
+.items{
+    display: flex;
+    padding: 2%;
+    align-items: center;
+    gap : 1rem;
+    max-width: 350px;
+    min-width: 300px;
+    height: 100px;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: rgba(207, 207, 207, 0.226);
+    transition: all 200ms;
+}
+.items:hover{
+    transform: scale(1.02);
+    background-color: wheat;
+}
+
+.tileContainer a {
+    text-decoration: none;
+    color: black;
+}
+
+.items img{
+    width: 60px;    
+}
+
+
+.profileTab {
+    font-size: 1.2rem !important;
+}
+
+
+/* CSS for UserProfile */
+
+.form {
+    padding: 5% 5%;
+}
+
+.profilePicBox {
+    width: 200px;
+    height: 200px;
+    max-width: 200px;
+    padding: 0% !important;
+    border-radius: 50%;
+}
+
+.editButton {
+    position: relative;
+    float: right;
+    top: 65%;
+    background-color: antiquewhite !important;
+}
+
+.profileName {
+    display: flex;
+    align-items: center;
+    padding: 0% 5% 0% 5%;
+}
+
+.profileForm {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3%;
+}
+
+@media screen and (max-width: 800px) {
+    .profileName {
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+
+/* CSS for UserProfile ENDS */
+
+
+/* CSS for Address */
+
+.addAddress {
+    display: flex;
+    cursor: pointer;
+    border: 1px dashed #91441f;
+    border-radius: 10px;
+    flex-wrap: wrap;
+    z-index: 1;
+    max-width: 300px;
+    min-width: 250px;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column !important;
+    max-height: 250px;
+    min-height: 250px;
+}
+
+.addressTile {
+    display: flex;
+    max-width: 300px;
+    min-width: 250px;
+    min-height: 200px;
+    flex-direction: column !important;
+    cursor: pointer;
+    border: 1px solid #91441f;
+    border-radius: 10px;
+    padding: 2%;
+}
+
+.addressContainer{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2rem;
+    padding : 5% 5%
+}

@@ -1,0 +1,49 @@
+hr {
+    margin-top: 10px;
+    border-color: rgba(226, 226, 226, 0.356);
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.formBox {
+    padding: 2%;
+}
+
+.posterImage {
+    height: 100%;
+    width: 100%;
+}
+
+.box {
+    position: absolute;
+    overflow: hidden;
+    top: 50%;
+    left: 50%;
+    width : fit-content;
+    transform: translate(-50%, -50%);
+    background-color: rgb(255, 255, 255);
+}
+
+@media screen and (max-width: 800px) {
+    .sidePic {
+        display: none;
+    }
+    .modelContainer {
+        display: flex;
+        justify-content: center;
+        /* align-items: center; */
+    }
+    .form {
+        display: flex;
+        justify-content: center;
+        text-align: center;
+        flex-direction: column;
+    }
+    .box {
+        padding: 1%;
+    }
+}

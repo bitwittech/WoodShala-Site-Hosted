@@ -1,0 +1,164 @@
+.readBox {
+    height : fit-content;
+    padding : 2% 1% 0% 1%;
+}
+
+.TOC {
+    position : sticky;
+    height: 100%;
+    top : 0px;
+    padding: 2% 0% 0% 1%;
+}
+
+.listText {
+    cursor: pointer;
+}
+
+.backBtn {
+    display: flex;
+    justify-content: end;
+    align-items: end;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    padding: 2% 0% 0% 5%;
+    max-height: inherit;
+    padding-bottom: 5%;
+}
+
+
+.banner-img {
+    padding-top: 3%;
+    width: 600px;
+    display: block;
+    margin: auto;
+}
+
+.content img{
+    /* width : 70%; */
+    aspect-ratio: 1;
+    margin: 2% auto;
+}
+
+.contentBanner{
+    width: 60%;
+    align-self: center;
+}
+.contentBanner img{
+    width : 100%;
+}
+
+img {
+    display: block;
+    margin: auto;
+}
+
+.TOCList {
+    height: 100vh;
+    overflow-y: scroll;
+
+}
+/* Hide scrollbar for Chrome, Safari and Opera */
+
+.TOCList::-webkit-scrollbar { 
+    display: none;
+}
+/* Hide scrollbar for IE, Edge and Firefox */
+
+.TOCList {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.youMyAlsoLike{
+    padding : 2% 1% 1% 1%;
+    margin : 2%;
+}
+
+.cardContainer {
+    display : flex;
+    gap : 1.5rem;
+    padding : 4% 3% 0% 3%;
+    flex-wrap : wrap;
+    align-items : baseline;
+}
+.cardContainerHome{
+    display : flex;
+    gap : 1.5rem;
+    padding : 0% 3% 0% 3%;
+    flex-wrap : wrap;
+    align-items : baseline;
+}
+
+.likeCard{
+    display : flex;
+    flex-direction : column ; 
+    max-width : 280px;
+    height: 370px;
+    align-items : baseline;
+}
+
+.cardText > h5{
+  height : 85px;
+  text-overflow: ellipsis !important;
+  overflow: hidden;
+}
+
+.cardMedia  {
+    /* aspect-ratio: 1 !important; */
+    width: 100%;
+    height: 200px;
+}
+
+
+
+@media (max-width:907px) {
+    .TOC {
+        display: none;
+    }
+    .content {
+        width: 100% !important;
+    }
+}
+@media (max-width:670px) {
+    .cardContainer {
+        justify-content : center;
+    }
+
+    .cardText > h5{
+        height : 120px;
+        text-overflow: ellipsis !important;
+        overflow: hidden;
+      }
+
+    .likeCard{
+        flex-direction : row ; 
+        max-width : 400px;
+    }
+
+}
+
+/* // blog home CSS============================== */
+
+
+
+.Blog-banner {
+    width: 100%;
+    height: 50vh;
+}
+
+.bannerText {
+    color: white;
+    left: 5%;
+    top: 5%;
+    position: absolute;
+}
+
+
+.MuiCardMedia-img {
+    object-fit: fill !important;
+}

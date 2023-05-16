@@ -1,0 +1,162 @@
+.nav {
+    color: aliceblue;
+}
+
+.topBox {
+    background-color: rgba(0, 0, 0, 0.849);
+    width: 90px;
+    padding: 0.2% 0%;
+}
+
+.center {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.right {
+    display: flex;
+    justify-content: right;
+    /* position: absolute; */
+}
+
+.mobile {
+    display: none;
+    justify-content: right;
+}
+
+.secondBar {
+    padding: 0.2% 10%;
+    color: #000000;
+    background-color: #fcefef;
+    display: flex;
+    justify-content: space-between;
+}
+
+.secondBar div {
+    font-weight: 500 !important;
+    display: flex;
+    justify-content: center;
+    flex-flow: wrap;
+}
+
+.secondBar p {
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.secondBar div p:hover {
+    color: rgb(146, 59, 38);
+}
+
+.main-1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2% 3% 0% 3%;
+}
+
+.logo img {
+    min-width: 180px;
+    max-width: 180px;
+    padding: 2%;
+}
+
+.main-2 {
+    display: flex;
+    justify-content: start;
+    padding: 1% 2% 1% 2%;
+}
+
+.main-2 a {
+    font-size: 1.2rem;
+}
+
+.hamburgerContainer {
+    display: none;
+}
+
+.hamburgerPanel * {
+    font-size: 1.3rem !important;
+}
+
+.hamburgerPanel a {
+    color: #88250e;
+    align-items: end !important;
+}
+
+.hamburgerPanel>div {
+    align-items: end !important;
+}
+
+.hamburgerPanel img {
+    width: 45px;
+    border-radius: 20px;
+}
+
+.listBox {
+    background-color: white;
+    box-shadow: 0px 6px 5px 3px #bfbfbf47;
+    z-index: 1;
+    position: absolute !important;
+    color: #000000;
+}
+
+.dropdown-wrapper {
+    padding: 0% 2% 0% 2%;
+    justify-content: space-between;
+}
+
+.btn:hover {
+    box-shadow: inset 0px -1px 0px 0px #88250e;
+}
+
+.listItem {
+    display: flex;
+    flex-direction: column;
+    align-items: baseline !important;
+}
+
+.listItem a {
+    width: 100% !important;
+}
+
+.listItem span {
+    font-size: 1rem !important;
+}
+
+.btn {
+    font-size: 1rem !important;
+}
+
+.searchBar {
+    margin-bottom: 0%;
+}
+
+@media screen and (max-width:800px) {
+    .right {
+        display: none;
+    }
+
+    .mobile {
+        display: flex;
+    }
+
+    .main-2 {
+        display: none;
+    }
+
+    .hamburgerContainer {
+        display: flex;
+    }
+
+    .searchBar {
+        margin-bottom: 4% !important;
+    }
+}
+
+@media screen and (width <= 600px) {
+    .topBox{
+        display: none;
+    }
+}
