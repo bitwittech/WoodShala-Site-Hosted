@@ -30,7 +30,8 @@ app.use('/upload', express.static(path.join(__dirname, 'upload')));
 // app.use((req, res, next) => res.render('maintenance'));
 
 // requiring the routes
-app.use('/api/', require('./server/routes'))
+app.use('/api/', require('./server/routes/routes'))
+app.use('/app/', require('./server/routes/routes_app'))
 
 app.use(express.static("frontEnd/build"));
 
