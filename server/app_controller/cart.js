@@ -1084,10 +1084,9 @@ exports.UPICheckOut = async (req, res) => {
 
 exports.verifyPayment = async (req, res) => {
   try {
-    console.log(req.body)
     const {
       CID,
-      DID
+      DID,
       order_id,
       razorpay_payment_id,
       razorpay_order_id,
