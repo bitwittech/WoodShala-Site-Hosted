@@ -1084,6 +1084,7 @@ exports.UPICheckOut = async (req, res) => {
 
 exports.verifyPayment = async (req, res) => {
   try {
+    console.log(req.body)
     const {
       CID,
       DID,
@@ -1095,8 +1096,7 @@ exports.verifyPayment = async (req, res) => {
 
     
     if (
-      !CID ||
-      !DID ||
+      (!CID &&!DID ) ||
       !order_id ||
       !razorpay_order_id ||
       !razorpay_payment_id ||
