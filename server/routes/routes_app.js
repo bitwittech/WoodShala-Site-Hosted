@@ -13,7 +13,7 @@ require("dotenv").config();
 const route = require("express").Router();
 
 // for product
-route.get("/getProducts",product.getProduct);
+route.post("/getProducts",upload,product.getProduct);
 route.get("/getProductDetails",product.getProductDetails);
 route.get("/fetchVariants",product.fetchVariants);
 route.get("/getCategories",product.listCategories);
@@ -24,7 +24,7 @@ route.get("/getBanner",utility.getBanner);
 route.get("/listMobileIntro",utility.listMobileIntro);
 
 //product slider trending adn etc 
-route.get("/getCatalog",product.listCatalog);
+route.post("/getCatalog",upload,product.listCatalog);
 
 // set address 
 route.patch("/setAddress",upload,user.setAddress)

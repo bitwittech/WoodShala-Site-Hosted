@@ -19,8 +19,20 @@ function filterParse(data,res){
   }
 }
 
+
+var priceRange = [
+  "500-2000",
+  "2000-5000",
+  "5000-10000",
+  "10000-50000",
+  "above 50000",
+]
+
+
+
 exports.getProduct = async (req, res) => {
   try {
+    // console.log(req.body)
     let {
       CID,
       DID,
@@ -29,8 +41,9 @@ exports.getProduct = async (req, res) => {
       category_name,
       product_title,
       filter
-    } = req.query;
+    } = req.body;
     
+
     if(filter)
     {
       filter = filterParse(filter,res)
@@ -73,13 +86,32 @@ exports.getProduct = async (req, res) => {
       });
 
     if (price) {
-      filterArray.push({
-        $and: [
-          { selling_price: { $gte: price.min } },
-          { selling_price: { $lte: price.max } },
+      // filterArray.push(...price.map((row)=>{return {
+      //   $or: [
+      //     { selling_price: { $gte: row.min } },
+      //     { selling_price: { $lte: row.max } },
+      //   ],
+      // }}));
+      
+      filterArray.push(...priceRange.map((row)=>{
+        if(price[row] === true && row.includes("above"))
+        return {
+        $or: [
+          { selling_price: { $gte: 50000 } },
         ],
-      });
+      }
+      else if (price[row] === true)
+      return {
+        $or: [
+          { selling_price: { $gte: parseInt(row.split('-')[0]) } },
+          { selling_price: { $lte: parseInt(row.split('-')[1]) } },
+        ],
+      }
+      else return {}
+    
+    }));
     }
+
     if (length) {
       filterArray.push({
         $and: [
@@ -236,7 +268,7 @@ exports.getProduct = async (req, res) => {
       return res.status(200).send({
         message: "Product list fetched successfully.",
         status: 200,
-        data: { data, filter: { materialFilter } },
+        data: { data, filter: { materialFilter, priceRange } },
       });
     else
       return res.status(203).send({
@@ -588,7 +620,7 @@ exports.listCatalog = async (req, res) => {
       category_name,
       product_title,
       filter
-    } = req.query;
+    } = req.body;
     
     if(filter)
     {
@@ -628,14 +660,34 @@ exports.listCatalog = async (req, res) => {
         },
       });
 
-    if (price) {
-      filterArray.push({
-        $and: [
-          { selling_price: { $gte: price.min } },
-          { selling_price: { $lte: price.max } },
-        ],
-      });
-    }
+      
+      if (price) {
+        // filterArray.push(...price.map((row)=>{return {
+        //   $or: [
+        //     { selling_price: { $gte: row.min } },
+        //     { selling_price: { $lte: row.max } },
+        //   ],
+        // }}));
+        
+        filterArray.push(...priceRange.map((row)=>{
+          if(price[row] === true && row.includes("above"))
+          return {
+          $or: [
+            { selling_price: { $gte: 50000 } },
+          ],
+        }
+        else if (price[row] === true)
+        return {
+          $or: [
+            { selling_price: { $gte: parseInt(row.split('-')[0]) } },
+            { selling_price: { $lte: parseInt(row.split('-')[1]) } },
+          ],
+        }
+        else return {}
+      
+      }));
+      }
+  
     if (length) {
       filterArray.push({
         $and: [
@@ -746,7 +798,7 @@ exports.listCatalog = async (req, res) => {
       res.send({
         status: 200,
         message: "Catalog list fetched successfully.",
-        data: { data: list, filter: { materialFilter } },
+        data: { data: list, filter: { materialFilter, priceRange } },
       });
     } else {
       res.status(203).send({
