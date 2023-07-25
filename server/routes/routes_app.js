@@ -63,4 +63,7 @@ route.post("/addReview",upload,product.addReview)
 route.post("/verifyReview",upload,product.verifyReview)
 route.get("/listReviews",product.listReview)
 
+// pincode
+route.get("/getPincodeDetails",utility.getPinCode)
+
 module.exports = route 
