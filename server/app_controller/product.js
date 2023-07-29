@@ -30,9 +30,6 @@ function filterParse(data,res){
 
 exports.getProduct = async (req, res) => {
   try {
-
-    
-    // console.log(req.body)
     let {
       CID,
       DID,
@@ -618,6 +615,7 @@ exports.listCatalog = async (req, res) => {
     let {
       limit,
       pageNumber,
+      catalog_type,
       category_name,
       product_title,
       filter
@@ -631,10 +629,7 @@ exports.listCatalog = async (req, res) => {
         message: "Filter Parsing problem !!!",
       });
     }
-
-
     let {
-      catalog_type,
       price,
       length,
       breadth,
@@ -650,8 +645,8 @@ exports.listCatalog = async (req, res) => {
     let catalog_query = {};
     let filterArray = [];
 
-    if (catalog_type && catalog_type.length > 0) 
-      catalog_query = { catalog_type: { $in: catalog_type } }
+    if (catalog_type) 
+      catalog_query = { catalog_type: catalog_type }
 
     if (product_title)
       filterArray.push({
