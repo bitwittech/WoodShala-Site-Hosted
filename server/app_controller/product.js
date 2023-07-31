@@ -133,10 +133,18 @@ exports.getProduct = async (req, res) => {
       });
     }
     
-    filterArray = filterArray.filter(row=>row['$or'].length > 0)
+    filterArray = filterArray.filter(row=>{
+    console.log(row)
+    if(row['$or'])
+    {if(row['$or'].length > 0) return row;}
+    else if (!row['$or'])
+    return row 
+    
+    })
     
     if (filterArray.length > 0) query = { $and: filterArray };
     
+    console.log(filterArray)
     
     // final aggregation computing
     let data = await product.aggregate([
@@ -709,11 +717,18 @@ exports.listCatalog = async (req, res) => {
       });
     }
 
-    filterArray = filterArray.filter(row=>row['$or'].length > 0)
+    filterArray = filterArray.filter(row=>{
+    // console.log(row)
+    if(row['$or'])
+    {if(row['$or'].length > 0) return row;}
+    else if (!row['$or'])
+    return row 
+    
+    })
     
     if (filterArray.length > 0) query = { $and: filterArray };
 
-    
+    console.log(query)
     // list = await catalog.find(filter).limit(10);
     list = await catalog.aggregate([
       { $match: catalog_query },
