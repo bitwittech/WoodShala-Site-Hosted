@@ -73,6 +73,8 @@ exports.getProduct = async (req, res) => {
       filterArray.push({
         category_name: { $regex: category_name, $options: "i" },
       });
+    else
+    category_name = ""
 
     if (product_title)
       filterArray.push({
@@ -680,6 +682,7 @@ exports.listCatalog = async (req, res) => {
     filterArray.push({
       category_name: { $regex: category_name, $options: "i" },
     });
+    else category_name = ""
 
 
     if (product_title)
