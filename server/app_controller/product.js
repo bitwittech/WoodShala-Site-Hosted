@@ -134,7 +134,7 @@ exports.getProduct = async (req, res) => {
     }
     
     filterArray = filterArray.filter(row=>{
-    console.log(row)
+    // console.log(row)
     if(row['$or'])
     {if(row['$or'].length > 0) return row;}
     else if (!row['$or'])
@@ -144,7 +144,6 @@ exports.getProduct = async (req, res) => {
     
     if (filterArray.length > 0) query = { $and: filterArray };
     
-    console.log(filterArray)
     
     // final aggregation computing
     let data = await product.aggregate([
@@ -164,22 +163,6 @@ exports.getProduct = async (req, res) => {
           discount_limit: { $first: "$discount_limit" },
           SKU: { $first: "$SKU" },
           category_name: { $first: "$category_name" },
-        },
-      },
-      {
-        $lookup: {
-          from: "primarymaterials",
-          localField: "primary_material",
-          pipeline: [
-            {
-              $group: {
-                _id: "$_id",
-                name: { $first: "$primaryMaterial_name" },
-              },
-            },
-          ],
-          foreignField: "primaryMaterial_name",
-          as: "materials",
         },
       },
       {
@@ -246,8 +229,47 @@ exports.getProduct = async (req, res) => {
       { $limit: parseInt(limit) || 10 },
     ]);
 
-    let materialFilter = new Set();
-
+        // getting the list of the materials according to the catogory name
+        let material_list = await product.aggregate([
+          {$match : {category_name : { $regex: category_name, $options: "i" } }},
+          {$project : {primary_material : 1,_id : 0}},
+          {
+            $lookup: {
+              from: "primarymaterials",
+              localField: "primary_material",
+              pipeline: [
+                {
+                  $group: {
+                    _id: "$_id",
+                    name: { $first: "$primaryMaterial_name" },
+                  },
+                },
+              ],
+              foreignField: "primaryMaterial_name",
+              as: "materials",
+            },
+          },
+          {
+            $unwind : "$materials" 
+          },
+          {
+            $group: {
+              _id: "$materials._id",
+              name: { $first: "$materials.name" }
+            }
+          },
+        ])
+    
+        if(material)
+        material = material.map(row=>row.name)
+    
+        material_list = material_list.map(row=>{
+          row.checked = false
+          if(material && material.includes(row.name))
+            row.checked = true
+          return row
+        })
+        
     // Discount Limit Comparison ==========
     data.map((row) => {
       if (row.categories[0]) {
@@ -255,19 +277,16 @@ exports.getProduct = async (req, res) => {
           row.discount_limit = row.categories[0].discount_limit;
       }
       delete row.categories;
-      row.materials.map((row)=>materialFilter.add(JSON.stringify(row))) 
-      delete row.materials;
+      delete row.wishlist;
       return row;
     });
 
-    // material filter add ==========
-    materialFilter = Array.from(materialFilter).map((row) => JSON.parse(row));
-
+  
     if (data)
       return res.status(200).send({
         message: "Product list fetched successfully.",
         status: 200,
-        data: { data, filter: { materialFilter, price : priceShow } },
+        data: { data, filter: { materialFilter : material_list, price : priceShow } },
       });
     else
       return res.status(203).send({
@@ -656,6 +675,13 @@ exports.listCatalog = async (req, res) => {
     if (catalog_type) 
       catalog_query = { catalog_type: catalog_type }
 
+
+    if (category_name)
+    filterArray.push({
+      category_name: { $regex: category_name, $options: "i" },
+    });
+
+
     if (product_title)
       filterArray.push({
         product_title: {
@@ -728,7 +754,6 @@ exports.listCatalog = async (req, res) => {
     
     if (filterArray.length > 0) query = { $and: filterArray };
 
-    console.log(query)
     // list = await catalog.find(filter).limit(10);
     list = await catalog.aggregate([
       { $match: catalog_query },
@@ -752,25 +777,10 @@ exports.listCatalog = async (req, res) => {
                 breadth: 1,
                 height: 1,
                 primary_material: 1,
+                category_name: 1,
                 product_image: 1,
                 selling_price: 1,
                 _id: 0,
-              },
-            },
-            {
-              $lookup: {
-                from: "primarymaterials",
-                localField: "primary_material",
-                pipeline: [
-                  {
-                    $group: {
-                      _id: "$_id",
-                      name: { $first: "$primaryMaterial_name" },
-                    },
-                  },
-                ],
-                foreignField: "primaryMaterial_name",
-                as: "materials",
               },
             },
           ],
@@ -778,7 +788,14 @@ exports.listCatalog = async (req, res) => {
           as: "product",
         },
       },
-
+      {
+        $match: {
+          product: { $ne: [] }
+        }
+      },
+      {
+        $unwind: '$product'
+      },
       {
         $skip: pageNumber > 0 ? (pageNumber - 1) * (parseInt(limit) || 10) : 0,
       },
@@ -787,24 +804,60 @@ exports.listCatalog = async (req, res) => {
       },
     ]);
 
-    let materialFilter = new Set();
+    // getting the list of the materials according to the catogory name
+    let material_list = await product.aggregate([
+      {$match : {category_name : { $regex: category_name, $options: "i" } }},
+      {$project : {primary_material : 1,_id : 0}},
+      {
+        $lookup: {
+          from: "primarymaterials",
+          localField: "primary_material",
+          pipeline: [
+            {
+              $group: {
+                _id: "$_id",
+                name: { $first: "$primaryMaterial_name" },
+              },
+            },
+          ],
+          foreignField: "primaryMaterial_name",
+          as: "materials",
+        },
+      },
+      {
+        $unwind : "$materials" 
+      },
+      {
+        $group: {
+          _id: "$materials._id",
+          name: { $first: "$materials.name" }
+        }
+      },
+    ])
 
-    list.map((row) => {
-      if (row.product.length > 0)
-        row.product[0].materials.map((row)=>materialFilter.add(JSON.stringify(row)))
-      return row;
+    if(material)
+    material = material.map(row=>row.name)
+
+    material_list = material_list.map(row=>{
+      row.checked = false
+      if(material && material.includes(row.name))
+        row.checked = true
+      return row
+    })
+    
+    if (list.length > 0) list = list.map((row) =>{
+      row = {...row,...row.product}
+      delete row.product
+      return row
     });
+    
 
-    // material filter add ==========
-    materialFilter = Array.from(materialFilter).map((row) => JSON.parse(row));
-
-    if (list.length > 0) list = list.filter((row) => row.product.length > 0);
 
     if (list) {
       res.send({
         status: 200,
         message: "Catalog list fetched successfully.",
-        data: { data: list, filter: { materialFilter, price : priceShow } },
+        data: { data: list, filter: { materialFilter : material_list, price : priceShow } },
       });
     } else {
       res.status(203).send({
